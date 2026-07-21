@@ -1,0 +1,62 @@
+{
+  "name": "Fradema - Nutrição (follow-up)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-manual",
+      "name": "Disparar",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://app:3000/api/leads?stage=morno,frio",
+        "options": {}
+      },
+      "id": "http-get-leads",
+      "name": "Buscar leads (morno/frio)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Monta uma mensagem de follow-up por lead (aceita array ou itens separados).\nlet leads = [];\nfor (const it of items) {\n  if (Array.isArray(it.json)) leads.push(...it.json);\n  else leads.push(it.json);\n}\nconst msg = 'Olá! Aqui é a Fradema Consultores. Passando para lembrar que podemos ajudar sua empresa a recuperar créditos tributários e regularizar dívidas fiscais. Quer retomar a conversa? 😊';\nreturn leads.filter(l => l && l.numero).map(l => ({ json: { numero: l.numero, mensagem: msg } }));"
+      },
+      "id": "code-monta-msg",
+      "name": "Montar follow-up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ numero: $json.numero, mensagem: $json.mensagem }) }}",
+        "options": {}
+      },
+      "id": "http-post-send",
+      "name": "Enviar no WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    }
+  ],
+  "connections": {
+    "Disparar": {
+      "main": [[{ "node": "Buscar leads (morno/frio)", "type": "main", "index": 0 }]]
+    },
+    "Buscar leads (morno/frio)": {
+      "main": [[{ "node": "Montar follow-up", "type": "main", "index": 0 }]]
+    },
+    "Montar follow-up": {
+      "main": [[{ "node": "Enviar no WhatsApp", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

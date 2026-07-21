@@ -1,0 +1,31 @@
+# MVP + n8n (dois serviços). Para rodar SÓ o app (um contêiner), use o Dockerfile direto.
+services:
+  app:
+    build: .
+    container_name: fradema-mvp
+    ports:
+      - "3000:3000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-5}
+      # webhook do n8n avisado quando um lead vira "quente" (opcional)
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-}
+    volumes:
+      - ./data:/app/data
+      - ./auth:/app/auth
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: fradema-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_SECURE_COOKIE=false
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - N8N_RUNNERS_ENABLED=true
+    volumes:
+      - ./n8n-data:/home/node/.n8n
+    restart: unless-stopped
+# Rede padrão do compose: o app é acessível pelo n8n em http://app:3000
+# e o n8n pelo app em http://n8n:5678

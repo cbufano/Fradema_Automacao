@@ -1,0 +1,608 @@
+<title>Fradema · Demonstração Comercial — Captação Automática de Leads</title>
+<style>
+  :root {
+    --bg: #EEF2F8;
+    --surface: #FFFFFF;
+    --surface-2: #E7EDF5;
+    --ink: #101F36;
+    --ink-soft: #47597A;
+    --line: #D5DEEA;
+    --accent: #0F9A6A;
+    --accent-soft: #E3F4EC;
+    --wa: #22a25a;
+    --wa-bubble: #DCF7E3;
+    --gold: #B67C1E;
+    --gold-soft: #F6ECD7;
+    --navy: #383D6B;
+    --danger: #C4453B;
+    --shadow: 0 10px 30px -12px rgba(16,31,54,.28);
+    --shadow-soft: 0 4px 14px -8px rgba(16,31,54,.35);
+    --font-display: Georgia, 'Times New Roman', serif;
+    --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Segoe UI Mono', Menlo, Consolas, monospace;
+    --maxw: 1080px;
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #08111F;
+      --surface: #0E1D31;
+      --surface-2: #152840;
+      --ink: #E9F1FC;
+      --ink-soft: #9DB1CE;
+      --line: #21374F;
+      --accent: #27B981;
+      --accent-soft: #123227;
+      --wa: #25D366;
+      --wa-bubble: #114D30;
+      --gold: #E7B24D;
+      --gold-soft: #2E2410;
+      --navy: #5157A0;
+      --danger: #E7695F;
+      --shadow: 0 18px 44px -18px rgba(0,0,0,.6);
+      --shadow-soft: 0 6px 18px -10px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #EEF2F8; --surface: #FFFFFF; --surface-2: #E7EDF5; --ink: #101F36;
+    --ink-soft: #47597A; --line: #D5DEEA; --accent: #0F9A6A; --accent-soft: #E3F4EC;
+    --wa: #22a25a; --wa-bubble: #DCF7E3; --gold: #B67C1E; --gold-soft: #F6ECD7;
+    --navy: #383D6B; --danger: #C4453B;
+    --shadow: 0 10px 30px -12px rgba(16,31,54,.28); --shadow-soft: 0 4px 14px -8px rgba(16,31,54,.35);
+  }
+  :root[data-theme="dark"] {
+    --bg: #08111F; --surface: #0E1D31; --surface-2: #152840; --ink: #E9F1FC;
+    --ink-soft: #9DB1CE; --line: #21374F; --accent: #27B981; --accent-soft: #123227;
+    --wa: #25D366; --wa-bubble: #114D30; --gold: #E7B24D; --gold-soft: #2E2410;
+    --navy: #5157A0; --danger: #E7695F;
+    --shadow: 0 18px 44px -18px rgba(0,0,0,.6); --shadow-soft: 0 6px 18px -10px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- header ---------- */
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 62px; }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: .01em; }
+  .brand .mark {
+    width: 38px; height: 38px; border-radius: 9px; flex: none; display: block;
+    box-shadow: var(--shadow-soft);
+  }
+  .brand .name { line-height: 1.15; }
+  .brand .name b { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
+  .brand .name small { display:block; font-family: var(--font-mono); font-size: 10px; letter-spacing:.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; margin-top: 1px; }
+  .top-tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 84px 0 40px; position: relative; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); display: inline-flex; align-items: center; gap: 10px; margin-bottom: 22px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent); display: inline-block; }
+  h1 {
+    font-family: var(--font-display); font-weight: 700; color: var(--ink);
+    font-size: clamp(34px, 6vw, 60px); line-height: 1.04; letter-spacing: -.015em;
+    margin: 0 0 22px; text-wrap: balance; max-width: 16ch;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .lede { font-size: clamp(17px, 2.2vw, 21px); color: var(--ink-soft); max-width: 62ch; margin: 0 0 30px; }
+  .hero-stats { display: flex; flex-wrap: wrap; gap: 14px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line); font-size: 13.5px; color: var(--ink);
+    box-shadow: var(--shadow-soft);
+  }
+  .chip b { font-family: var(--font-mono); color: var(--gold); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* ---------- stage ---------- */
+  .stage { padding: 34px 0; border-top: 1px solid var(--line); }
+  .stage-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 24px; }
+  .stage-num {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 8px; padding: 4px 9px; flex: none; letter-spacing: .05em;
+  }
+  .stage-head h2 { font-family: var(--font-display); font-size: clamp(22px, 3.2vw, 30px); margin: 0 0 4px; letter-spacing: -.01em; }
+  .stage-head p { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .card-pad { padding: 22px; }
+  .card-label {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-soft); margin: 0 0 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .browser-bar { display: flex; gap: 6px; padding: 11px 14px; background: var(--surface-2); border-bottom: 1px solid var(--line); align-items: center;}
+  .browser-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+  .browser-bar .url { margin-left: 10px; font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-soft); }
+
+  /* discovery grid */
+  .src-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .src { font-family: var(--font-mono); font-size: 11px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+  .src em { font-style: normal; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; }
+  .src.free em { background: var(--accent-soft); color: var(--accent); }
+  .src.paid em { background: var(--gold-soft); color: var(--gold); }
+  .src-note { margin: 14px 0 0; font-size: 12px; color: var(--ink-soft); font-style: italic; }
+  .disc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .company {
+    border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--bg);
+    position: relative; transition: border-color .3s, box-shadow .3s;
+  }
+  .company.match { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-soft); }
+  .company h4 { margin: 0 0 4px; font-size: 15px; font-family: var(--font-body); }
+  .company .meta { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); line-height: 1.7; }
+  .company .flag {
+    position: absolute; top: 12px; right: 12px; font-size: 10px; font-family: var(--font-mono);
+    text-transform: uppercase; letter-spacing: .1em; color: var(--accent); background: var(--accent-soft);
+    padding: 3px 7px; border-radius: 999px;
+  }
+
+  /* enrichment: company -> owner */
+  .enrich { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px; }
+  @media (max-width: 640px){ .enrich { grid-template-columns: 1fr; } .enrich .arrow{ transform: rotate(90deg); justify-self:center;} }
+  .enrich .arrow { font-size: 26px; color: var(--accent); font-family: var(--font-mono); }
+  .owner-row { display: flex; align-items: center; gap: 14px; }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 700; color: #fff; font-size: 20px;
+    background: linear-gradient(135deg, var(--gold), #8a5c12);
+  }
+  .kv { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); line-height: 1.9; }
+  .kv b { color: var(--ink); font-weight: 600; }
+  .kv .found { color: var(--accent); }
+
+  /* outreach: whatsapp + email preview */
+  .outreach { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px){ .outreach { grid-template-columns: 1fr; } }
+  .msg-preview { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); }
+  .msg-preview .ph { display:flex; align-items:center; gap: 9px; padding: 10px 14px; font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--line); }
+  .msg-preview .ph .ic { width: 22px; height: 22px; border-radius: 6px; display:grid; place-items:center; color:#fff; font-size: 12px; flex:none;}
+  .ic.wa { background: var(--wa); }
+  .ic.em { background: var(--navy); }
+  .msg-preview .body { padding: 14px; font-size: 13.5px; color: var(--ink); }
+  .msg-preview .body .ai-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing:.1em; text-transform: uppercase; color: var(--accent); display:block; margin-top: 12px; }
+
+  /* ---------- whatsapp phone centerpiece ---------- */
+  .center-stage { background: linear-gradient(180deg, var(--surface-2), var(--bg)); }
+  .phone-layout { display: grid; grid-template-columns: 340px 1fr; gap: 34px; align-items: start; }
+  @media (max-width: 860px){ .phone-layout { grid-template-columns: 1fr; } }
+  .phone {
+    width: 340px; max-width: 100%; margin: 0 auto; border-radius: 34px; background: #0a0f14;
+    padding: 12px; box-shadow: var(--shadow); border: 1px solid var(--line);
+  }
+  .phone-screen { border-radius: 24px; overflow: hidden; background: #0b141a; height: 560px; display: flex; flex-direction: column; }
+  .wa-header { background: #1f2c33; color: #e9edef; display: flex; align-items: center; gap: 11px; padding: 12px 14px; }
+  .wa-header .av { width: 38px; height: 38px; border-radius: 50%; background: var(--wa); display:grid; place-items:center; font-weight:700; color:#fff; flex:none; font-family: var(--font-display);}
+  .wa-header .who { line-height: 1.25; }
+  .wa-header .who b { font-size: 14.5px; }
+  .wa-header .who span { font-size: 11.5px; color: #8aa0ab; display:block; }
+  .wa-body {
+    flex: 1; padding: 16px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+    background-color: #0b141a;
+    background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,.02) 0, transparent 40%);
+  }
+  .bubble {
+    max-width: 82%; padding: 8px 11px 7px; border-radius: 10px; font-size: 13.5px; line-height: 1.45; color: #e9edef;
+    position: relative; word-wrap: break-word;
+    animation: pop .28s ease;
+  }
+  @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98);} to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .bubble { animation: none; } }
+  .bubble .t { font-size: 10px; color: rgba(233,237,239,.5); float: right; margin: 6px 0 -2px 8px; font-family: var(--font-mono); }
+  .bubble.out { align-self: flex-end; background: #005c4b; border-top-right-radius: 3px; }
+  .bubble.in { align-self: flex-start; background: #202c33; border-top-left-radius: 3px; }
+  .typing { align-self: flex-start; background: #202c33; padding: 12px 14px; border-radius: 10px; display: none; }
+  .typing.show { display: flex; gap: 4px; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: #8aa0ab; display:block; animation: blink 1.2s infinite; }
+  .typing i:nth-child(2){ animation-delay: .2s; } .typing i:nth-child(3){ animation-delay: .4s; }
+  @keyframes blink { 0%,60%,100%{ opacity:.3; transform: translateY(0);} 30%{ opacity:1; transform: translateY(-3px);} }
+
+  .side { display: flex; flex-direction: column; gap: 16px; }
+  .insight { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow-soft); opacity:.4; transform: translateY(8px); transition: opacity .5s, transform .5s;}
+  .insight.on { opacity: 1; transform: none; }
+  .insight .h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+  .score { display:flex; align-items:center; gap: 12px; }
+  .flame { font-size: 26px; }
+  .score b { font-family: var(--font-display); font-size: 22px; }
+  .score.hot b { color: var(--danger); }
+  .tags { display:flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .tag { font-family: var(--font-mono); font-size: 11px; padding: 3px 8px; border-radius: 6px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line);}
+
+  /* calendar */
+  .cal { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .cal .day { text-align: center; }
+  .cal .day .dn { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing:.08em; margin-bottom:6px;}
+  .slot { font-family: var(--font-mono); font-size: 11.5px; padding: 7px 4px; border-radius: 7px; margin-bottom: 6px; border: 1px solid var(--line); color: var(--ink-soft); background: var(--bg); }
+  .slot.busy { opacity: .35; text-decoration: line-through; }
+  .slot.free { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+  .slot.booked { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; box-shadow: var(--shadow-soft); }
+
+  /* crm kanban */
+  .kanban-scroll { overflow-x: auto; padding-bottom: 6px; }
+  .kanban { display: grid; grid-template-columns: repeat(4, minmax(200px, 1fr)); gap: 12px; min-width: 720px; }
+  .col { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .col > .ch { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing:.1em; color: var(--ink-soft); display:flex; justify-content: space-between; margin: 4px 6px 10px; }
+  .col.hot > .ch { color: var(--danger); }
+  .lead {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 11px; margin-bottom: 8px;
+    box-shadow: var(--shadow-soft); font-size: 13px;
+  }
+  .lead h5 { margin: 0 0 3px; font-size: 13.5px; font-family: var(--font-body); }
+  .lead .sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft); }
+  .lead.new-lead { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+  .lead .assigned { margin-top: 8px; font-size: 11px; color: var(--accent); display:flex; align-items:center; gap:6px; }
+  .mini-av { width: 18px; height: 18px; border-radius: 50%; background: var(--navy); color:#fff; font-size: 9px; display:grid; place-items:center; flex:none; }
+
+  /* loop / nutrition */
+  .loop { display:grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  @media (max-width:720px){ .loop{ grid-template-columns:1fr; } }
+  .loop .step { background: var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow: var(--shadow-soft); }
+  .loop .step .n { font-family: var(--font-mono); color: var(--gold); font-size: 12px; }
+  .loop .step h4 { margin: 6px 0 4px; font-size: 15px; }
+  .loop .step p { margin:0; font-size: 13px; color: var(--ink-soft); }
+
+  /* value / outcome */
+  .outcome { background: linear-gradient(135deg, #383D6B, #20233F); color: #eaf1fc; border-radius: 22px; padding: 40px 34px; box-shadow: var(--shadow); }
+  .outcome h2 { font-family: var(--font-display); font-size: clamp(24px,4vw,34px); margin:0 0 24px; color:#fff; letter-spacing:-.01em; }
+  .metrics { display:grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+  @media (max-width:640px){ .metrics{ grid-template-columns:1fr; gap:16px;} }
+  .metric .big { font-family: var(--font-display); font-size: clamp(30px,5vw,44px); font-weight:700; color:#fff; line-height:1; }
+  .metric .big.gold { color: var(--gold); }
+  .metric .lbl { font-size: 13px; color: #b9cbe6; margin-top: 8px; }
+
+  /* compliance strip */
+  .compliance { display:flex; flex-wrap:wrap; gap:10px; margin-top: 30px; }
+  .cbadge { font-family: var(--font-mono); font-size: 11.5px; display:flex; align-items:center; gap:7px; padding:8px 13px; border-radius:999px; background: var(--surface); border:1px solid var(--line); color: var(--ink); }
+  .cbadge .ck { color: var(--accent); }
+
+  footer { border-top: 1px solid var(--line); margin-top: 20px; padding: 30px 0 50px; color: var(--ink-soft); font-size: 13px; }
+  .disclaimer { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-soft); background: var(--surface-2); border:1px dashed var(--line); border-radius: 10px; padding: 12px 16px; margin-top: 20px; }
+
+  /* theme toggle */
+  .toggle { background: var(--surface); border:1px solid var(--line); color: var(--ink); width: 36px; height:36px; border-radius:9px; cursor:pointer; font-size:15px; display:grid; place-items:center; }
+  .toggle:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img class="mark" alt="Fradema" width="38" height="38" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAgAElEQVR4nO2dd5gb1b33v2dUV9re7PV6vcUFr3fXBdu429gGdxtjg4mNIZBACk/I5SF5L7nhJSQkl/um3JRLICGNG9KAEHcbDDY2Bvfe7XVZty3e3rRV0nn/mKKRVtJqiqSRNT8/6/ns7NE5v3PmlK/OnDlDJs14loIggFFA+CPLlAKEAJSyv/fH7BEghACgqjObBgEFBfhzMcSEK1+do8NG38ovrvKgRFT/OeZ+Zy9g/8we+QiJ+iyqSJQg5liUI52jwEbfXl4cwKtxkICngrK/UURdlu6TppjSsJeQzoGZ8TpFCXcUhYI3sxKHPYbCnmOYmJNcNFYZnFwEdI4CGyEY4doCf4T/EUCQNaIeuD8OZxcqJMFKi1hkwpU51xx0jiAzXt29v57f18RhQmGIv2OHgaX6ozEmovzoHHk2Ukq4L5SinokEbwN8GwqFCYjobDiYclmhomzFDhOwM2sAhBkznSPHRkIo+Bkeca8qUjLexjUWT+D+WRyV2uxJTgOlKYcBaXJSZ1WZ8a60/F8hfIEFvFm6BIqU0ZhlSqlwWufIspG/sQV4Lg3byXvm871YCElCYiIptHQW/NJOfZbE4rIPVxnpHJh1CRRtRvRlQDyzLoE0wNGWAfHMrAQCOD3Bdf0U3OwEO0shZuF2PhdTSMwNMmFjiDrVWGOincEoHtnoJXX4X9g2AH5ZhJiFo5QhRzzIqM18EhoaVqUzARFlTOfIsZFyQwDx1HpuBPDPFNJaGCFspPxsverstWAPscnCuKpzpJkBCFuJPFdDMP/fA8TH/pm9vtTzSdWZCv7FJBMIjUHnyLMugTTB2pEE8ca6BNICa0gSxBvrEijaTBB1GRDPrEsgTbB2JEG8sS6BtMAakgTxxroEijYTRF0GxDPrEkgTrB1JEG+sSyAtsIYkQbwxQ8BWfgoAhBueCfVcIAJvBj+E05CYAoJ8Cg97jrHI4nLVOfJsZLtqtsfml0VD3EP5GN/7suFo/xxuI/yBxDCLy0rnSDLDSyD2SIXrIRj1Zv77Mg2VRfGHg339izkGAEo9Ra5zRJnxNAiWPDKGPw9vpqIwobDQuBAW1oKMUSSBKLwbs84RZV0CaYLFZaVzJNlIKQUh/Caz3hcIgHdjoKI2EqTuT5k0CrmDMqGbNu3YiUuouFbDygB+XjBO2ehpEAT8AM2eE7opj7FBQAknkQLwssWTMXvWWGGmJtzGN+BY5Gik+avX16OiogYgrAzgO7145PBIIJ+KGe4KxP8uTjeWONJp2mxW7jqFLhXuVA6LBNp/8DzqG1ohNkIAk8mE5KQEZGWlIm9wFpKTbFDLxI0h1jjSadrtVr7QNCNFosVhkUCbtu73Hkl8GhEIYGAY5AxMx5iyIkybUoqxY4YiLTWR880jnfrjaFdepSzOT6TSTLRZIZ4J0YIUubMkkB855GtuN0VlZQMqqxrwwUeHkZGejGlTS/HIQ7OQn5ftJQ90CaQu2+26BAqrBPJi9P8dgFKgvqEVGzbtxcc7j2Ll8hl48rF5sFrNCNVC7QUB4IOPDqO9vTPkuNU0QggYQsAYGBiNBlgsJlitZthtViQl2pCSYkNKsh1Wq1mXQLEqgbyYcBVPSDc4Ozq68Je/78CJU1fw01ef9vqeoIoEAvCnP2/Hrao6buTjX1oRHWYX87GdAN/5GAwMUlLsGDQwA3l5WRg+NBd3DR+MwsIcpKbY5eVbxHa7LoF41uaNMAqcPlOB//7l+3jpPx6F0WhgU1VBAgmfF/kXffYuK6fLjcbGNjQ2tuH0uWsgOAyGYZCaYsfosiLcP+duTBw/AklJNnkSSJ8FEljTa4E++fQEyi9XIhST8sU5UN6iwqxjniIPwG6XC41Nbdi95yRe/P5bePKrP8M/3tuFjo4uUTShlYHdJpJAEny4E1nTa4GcLhf2fHZKSD6QBAr2d18WziGG1wKB4lZlPf7n9Q1Y+6Uf46OdR+F2u0MuA3tigrx070DWpgQS2Zlz1zxpx4UEksbVNY145dW/4sjRcjzz1WXCd4RgZWBLsChO905hTUsgSikqqxvQ09OL/uxOl0DB2OVyY/O2A/j37/4et2ubuNOBy8BgYJCQYFac7p3AmpZAIEBHRxeaWxycz30valxKoAB8+uxVPPv86yE1Ars9QbV0Y5kZQQIBEB6XF3aJ6GtsCAJCSIis7F9Pj1OYsw92E4kQEhJ78iE6H0UGP+QSdfjGrTq89Mqf0draEbQ87DaLqunGKmteAjmdLjhEMx2BLJ4lkC+fPlOB3/x+M9zuwKOk3Z6gerqxyJqXQG63G11dPZzPugQKlbd+cBC7PzsZsDz45RBakSK6BArwj1Kgp8fJpq1LoJDZ6XLjjTc3obOzW5dAsSyBAMDpdKE/0yVQX66sasC6jZ/7l0A2XQIRcC/JY8uEiGqu6Ae+7HmzeSjMzr17eh457HZTiOf9xSy54lPPOV6MRJOF4qUIC7/7rz1oamrrUx6JdmtY040VZggB2/Nzm2FRXg8F+CFcWBIiA+COVDZTgT1Dk2wJROB1nkSZ+TyKy0pNrqtrxvYdR/tKILs1rOnGCjMAwKt2CCOBp9JB6K9YFsJwv/bHni+r8tk7HqqIPRF6eoNoMp9XTz7V501b96PTZyLBZreGPd1YYIZSvrKxJ/g+llCuQVDixZSTTJQiJFZDAgF8PH0lkGQThkCqkf+lXzSpfONmLQ4duSA6z0qgcKcbCxwTEog3XQLJY7fbjQ+2H/bKt92mSyBCACPASyCwdY5wEohQ7jzbT/EshBGHD8KeL6vsH+Swdzx8w5DPvI+Cm1FkdsZLVHRh4v0Hz+GzvaeFZyuu37gtpB/OdLXORnGdIJ7yEL00Q2geALhdpKnoE/2wWNJ4EpbGnngCN4iQjfIHyh2JcDIazJduuC94d7cT//7iH7jyInw/B2ioMkaDjWxB8POj3GN6fAg/RoRa7rmYwZlP0FPw0pmLTfSLPwkULBzP/maUGIMBBgMTMM/aNcp91+IaFfX87l1uOgdiXQIR4MFlU7F08RTElFHui7SbwuV2w+V0odfpQm+vE93dveju7kVHZzfaHZ1ob+9Ea2sHmlscaG5uR2NTG5qa2tDu6BI1Hm30yLoE8sOeeMIjgTIzUjBiWK5qDUwKRyNNgP1i3NHZjbq6FlRVN6Cyqh63btXj+s3bqLndhLr6FtEaLO1UWLVZl0BgH73s7vZ+6IZhCAwGBgzDSIpfDocz7kBsMBiQlGhDUqINRYU5AHgJRdHZ1YPWFgeu36zF+Qs3cO78dZRfrkRTczt6e/l1WRDFGbusSyACrNu4F7s+9aycBACjgYHdbsXAgekYOSIP90y4C/lDBoRtBPDNZ7SYEPaRSbvNipycDEyaOBIA0NHRjYrrNTh1+ir27j+LM2evoYdrDFrpzeWwLoFA0NjYisbGVq7xCwkKvG37YTAEGFNWhMfW3IdJE4vBeBaSq2LRrvjBGGD3EiopzkdJcT5Wr5qNlhYH9h04i492HsOpM1fR0dGjmUothXUJ5HEwKFMKnDh1FWfP/xEL592D577xIBISLCGnG0oeJOWDkyu+X2IjJatSUxOxaMEkzL9/Am5V1uOjnUex9YODqK1r9upDPJ/VJusSyDdb/XBvrwubtuxHW3sHvvcfa2GxmBT5058E6uzsRnVNI6qqG1Fb14T6+lY0t7Sjvb0TXd09cDrZ7VAMBgZmsxE2mxWpyXakpychOzsVg3OzkJuTgcTEhH7TksMGgwFD8rLx9JOLsGrFLHy88yj+/t4uVNc0aqaXD8a6BJJ5A2vXpydQUlyANY/MlpZ+AOvtdaLmdiMqrt9G+aVbKC+/havXqnG7thlOpwteN7AkstFgwIABqSgemY+ykgKUlhSgqCAHFotJ1QaRkmLHygdnYOniKXh//R688/6nqKtr0Uxl98e6BPI4KJk3btmHFQ9MQ0KCRZIPYr5w8Qb+uW4Pzl24gdq6ZnR0dHvS4coguCskwHkPO11OVFaxO3Hv+OQYTCYDBgxIx8S7R+DemWNQOirfS84plUkWiwlrHpmDubPH4a2/fIQPth8SZo+C5yXyrEsg32xJ4OqaRly6XImy0kLZ/pw8XYGtHx4K0KsG78XS0hKxdvV9yEhLwoYt+3Di5BVP9gJ+lqK314Vbt+pw82Yt1m/ai4L8Abhvzt1YumgysrNSVRkVCCEYkJ2G73zrEcyYWopfvLYOVdUNIeUrkqwvh1bwf6/ThdNnK6T74M8tKp1feP4RrH74Xsy7bzx+/KOnMCA7TVY8167fxu//tA0Pr/kh/t/P3sHVimqvzkIJA8D0qaX442+ex/z7xivKbzhYl0AeB2Xx5StViqWDnOQNBgYTxo8Q4khKTMCAAanCplhy4uzpdWLjlv3Yses45s0djycem4eszBRVpFFqaiJe/M6jGFo0CH96e7twlznaEkh/Ikwh36qsV+yPnJ5raFEO7Darl6QSVzglPWN7eyfWb9qLp77+c2zYvE/YlEDpqGAyGrB29Vy8/N21SEpMUOynGqxLIIX/8z2uUpN6AadOLhGdp/2Gl8N19S34yc/fw799+w3cuFnrJy3pTAjBrBmj8aufPYOMjGTVfZbK+hNhCrmpud3LJ8n+cHkUl1V/bLWaMWNaaZ/4xOUlNc5ADFAcO3EZzzz3GnbsOi7sNicnr2IuHjkEP331aeQMzFDdZymsSyCF7Ox1ee1cFwkJNKasCHcNz+ubJ/gPrwY3NLTih//1V7z5x61wud2KRwIAKL5rCP7zB08gPT0pLD6HwroEUuH/js7uvulIdSvEi2ZLsOCrTy3xWosULgnkyz09Trz9tx14+Ydvo629U7VG8OMffpl9eXeY/ffHugRSgcVbN4ZTAhkMBF99ajFGjsjzG5+4vMIpG3buOo7vvfJnQf4plUMlowrwwrdWwWo16xIo1iQQKOByeWZJwiWBDAYDnnx8Ph56cKZXpxApCeTLBw9fwHdf/hMcoqfKfP2R8sX4vjl3Y+3quRHzX5dAKkqgQJVQkltBLlRmRjJefvExfPmLCwTpE7hChRanUqaU4sTJq/jOS39QRQ4xhODxNffh3pmjI5oX/UaYx0HFHKoPffPgHR0hgN1mxZAhAzBrehkWzpuIzBBuSInjCkP2/PKRY5fw01+8hxdfWAOrxSy7DADAbDbh2889jHPnb6C2rkkUJnz+62uBfLMlg4UoZfqTkGBBdlYaCgsGoKgwByOGD8bwobkYkJ0m7FbhTzb4stjYUTQyvHPXCeQMzMAzX1ka0LdQOSM9Gc9/cyVe+sH/ole4ARc+/+NvOTSAstIC5AxMl/y5QGaxmGV/dvmyqXhw2VSYTEa/DUR6JYpcxefZ7XbjL3/fgRHDcjF39jjFjWDm9DIsWjgJGzbtC7v/cSeBQCle+s7agPmTYx7ZIX34t5hNPnHJlxDevvQ9F27+xa/XYejQQSjMH6g4L19+fD4OHb6A6prGsPocl7NADMM2LELUYbGP8maB+uZTDotNzhdCpdzY2IZfvrZOmBZWkpfMzBR86fH5Yfc5/maBNGpqNYJoVHwxHz5ajvWbPlclL4sWTEJJcX5YfY67G2FaYzXjE5cXP0pFmil1449/3o66+hbF+WIYgqeeXAiz2Rg2n+NOAmmNxUelLLZojgRtbR146+3tcLvdsvPC84TxIzBuzLCw+axLII3YnSKBeN62/RAuXa5UnC+jwYDHH73fa/NiNf2Mu1kgSin+8o+daG11BMyjVHv0C3OQmpIYsg9idji60NnZDbPFBIvFBJPRIDlPYhMP8b7nIsnd3b3427uf4PsvPs7JDellw1tZSQFGlxbh+MnLqvsZdzfCKICNm/ehsrJetRthyxZPRmpKoix/tm0/hDf/sBWJiVYkJ9uRmZGM3EGZuGv4YIwbOwyDcjL6jHiBWGzsKBpd3rvvLCquVWNo0aCQ/A/EJpMRDy6biuMnL6vuZ/zdCKP8gXJHz4ilhOWa203ZLcwdXbhd24zyS7fAj3wGA4Mpk0bh6ScXYviw3BArTvQrPs+Oji6s37QX337u4X587p/vnTUWmW9sQF19i6p+xt0sEAi8zhMVWOyTZH+4PIrLimeXy4XP953BM8+9hrf/9rGwGa2WZ4F8efvHR+BwdMkqGzGbjAYsnDeRO6+en3E3C+SJ0DO6KGWxj/JmgcRx9GWHowtv/nEbfvzf78LpcvktF1/rL85IcbujC7s/OxnQZyk8e9ZYmM1GVf2Mv1kgLwmk1v/Krb8L5Xa7se3Dw/jla+vgcgV7JDH0OCPF2z8+0o/PofGI4bkoKshR1TddAqnAYp/UlED+eMPmffhk93G/aYrLSysSiBDg7LnruF3bpEgCEcJuxDt9WqkugeJNAonZ5XLjN7/fgvqG1r55Qt/wWuCOzm4cPX5JdF7+SDB10iihYegSKI4kkJiraxrx7j93i87ToOG1wJ/vO6NYAgHAkLxsDM7NVM03XQKpwGKfwi2BeN6+4yjcbne/EmjSxJF45itLYbEYZaelBl+4eBPt7Z2yy4lnm82C4pFDVPNNl0AqsNjHcEsgnusbWriXUPgfgfjTX/nSIqx+ZA7Gjh4qOy01uKm5Hdeu3+bOyx8JAHZfJLV86/N2aML957n9RbxYaEIUITHhbp6xPaY8BqT39MF6XK+sUOUsRCl7BOg7soXCtyrrvfMkMkIIykoLUTxyCExGA1Y8MF1RWkrZ6XTh7PnrqsQ5urRINd+MAN/bExBChWsqLIRgBbnARDRQ8HWgPyaUAJzEksXo2wuIjf9OEBJz0fiOBmpwyD74MFvGovhCZPZ9XJ5RpLurVxitGcIIlZ5SiqmTR2HAgDTU1DTKSksNPn/xRtDrGKoV5A+A1WpCZ2ePYt8YylV1Qiko5Xpd/ksvRIEFJuD/hcbwtAi5zFmg1izfxPpZCaviiTDShspbPziI1tYOEEKw/+A5VFyvEcLkDEzHtCklgo8mkxHLFk1mta+MtNTgS5crVRnJjUYDCgtyVPHNKMgbQkCogJ4LE6jShdrK4JE0/FcIqSxOW+mw12dbFKoSK/BN7udOnr6KVWt/hMzMFFy7XiNsXAsAixdOErYg58MvmDcR77z/KdraOhSlK5dv3KxFT08vzKLnoOXGObQwB+cv3FAcjy6BAE8rU8iRlkAA0NLqQEubw+t8UqIN8+8b36fMcgamY8qkYmzfcURWWkrZ6XKhsqoBBfkDoNSG5GUrKjddArGxxLQECsTTppQgZ2C6XwnxwJKpMDCMamlJ5VtV9V7+yOVBg9hl4kr9YbwkEAQUZBCbsIcltzJwMzmEyGc+bRUKDr75osqZN1n+oG8cSnnViplgGMZvmJLifIziHjSPtAQCgOqaBlXiycpI8XpKTJdAcSqBfLm0pADFI4cELC+z2YglCyexL/eLsAQCAerrWlSZCUpJscNsNnq2ptclkBy7syQQwxCsWDZd8Ku2rtnvyHP/nPFITrSplq4Ubmhq6+OPHLbbrTCbTIr90SXQHSSBcgZmYOb0MgBAc4sD33vlz+h1uvqEt9ksWLJoclQkUEuz97PYcuNJSLDAJHo2QG48DMBKILbS8SRa/EC9mQ9NSYhMKDe9qoQhLCHw9yP+e38M3/hAFTNv8pdCUAj/FPCCeRNgt7Nvjtzz+SmcOlOBfQfO+i2zhfMmIsFqViVdKezo7ILbHfhahvpjMbMbCCj1R5dAd4gESrQlCI8MOp0ubNi8DwCwcfN+uFzei+YIIRhalIPRZUURl0Dd3b1wufv6I5UNBobdUFiXQLoEAoAZ00oxKIddJnz02CVculwJADhyrBxXr1X3Cc8wDB56cIb3tVXoQyjc2+MEFW2YJTceQojX45G6BIpjCQQADz4wHYSwca3fvBdOpwsUFD29vdiy7aDfchs3ZhgK8gcqkhBS2eVyqyKBKKUwMIxif3QJdAdIoLtG5KGspAAA+7DM3v1nvcLs+vQEmprb+4xCNpsF8++fEFEJ5KZu9rIqHMn50VyXQHEugRiGwaqVM4Vz76//TND8vNU3tOKT3Sf8xvPA4imwWEwRk0BePZrCON0uKim8LoHuQAk0cEAapk8pBaUUTc3t2LnrmN/wGzbvg5t7wbX4JyXFjjmzxkZMArHvVCCqSKCeXqdyfyh0CaScVfFE1lA+b+54JCfbQAjBns9OobauxW/4K1ercPL0Vfa8zyi0dNFkdgvyMMkeMRsMDBgufSUjudtN0dvr1CVQPEsgu82KJYsmA2A3o123cW/Q8O+v/wxu0YjFny8rK8TIEUNk+SCVLWaT11vu5cbT09OLXqdTcTz6WiBAOKeUQ/bBh9kyFsUXIk+dPAo5OemglOLo8Uu4eq2au5b+wx88dAFVVQ1euyoAgIFhsGzJFJw+W8F+XoIPUtliNcNgYIJez1Css6uHnVINkt9QWJdAMSyBVjwwXZATG7ipz2DhHR1d2P7xEb8j0vQpJcjOTpXsg1ROtFmFNJWM5A5HF3p0CRS/EmjkiDyMGV0EQghu3qrF5/vOhvTZbdsPoU20PQlvKSl2zJ87XrY/oXJamrz3KPhya2uH8DI+JfHos0Cgipm3SM0CEQKvB97XbdzLzq+H8Nma203Yt7/v+iAAWLZkiiBPlM6uBOL09GRVZoAam1qFm31K/NElUAxKoKysVMycXgZCCJqa27Hjk+Mhf9btdmPDZu8vy3w+Budm4Z4JIyX7I4Wzs1L7pCuHq7g9keJCAiktLG/2yVcMSqCF8yYiJcUOANjxyXHUN7RIiufEqasov1TpN8zK5dNhNBok+SOF+TfeKI3nxo3bqsQTExLIwDDqSSCwL7iOVQlks1mwaP49oJSiu7sXWz44ADm2YfNev2U5ftxw5OdlK5YWgTgvN1MVCXTt+m1V/DFScBOelCMWuWbCX1kxe3pRtgfsj6lH0vBxSmSTid/X0v80olTz9HB8fqlCVm78+CtcjwA8+Z5i5A7KBCGsnHn2aw/AJVpdGarZbOxzA/yzw5Symw1brWYsWnAPfv3bTSH5I4UTrBZkD0hj88tVED5dKQwAl69WSSq3QKz5fYEYhsAqWquixrDntfZFLGOUsAJ/pIR9eMVM4WHwhAQLJk64C2qYOK15c8fjr//YieYWh6oSaGhhDgyM926ccuKprKoXNgRT6pvmb4QZDEbYbJagPW2gkSEQ27neT7CAX/ilsRQfxEz5UZKPLwCPGD4Yo0sLuVmQNpziljbINYvFjEkTR3rdmQWAjIwUzJxeho1b94fe0YXovxoj5tlz19g6q4JvmpdAZpMRiaIdztSQQMlJNiGhWJFAIMCKB6aB4b4PvfPP3fjrP3bKkhA8m80mvPGrZ1FSnO91HqBYvmwaNm09oJoEAgFGFecL102JBDp5+ioIiCq+aX4WyJpg9noJtZyZFl/OyEj25ItCMfMmxx/xMRgPyE7F7JljAbBbjW//+EjInw3EPT292Mg9OukbpviuISgrLVRNAlktJhTflac4nu7uXpw6U6E4Hp41PwuUmZ4sPOgd6EfwM0TOGZjeZyZHCfMmxx9PGQeftbifW/VJKcWez06x78sNEj5U3rHrOFpaHX7L9cGlU9keW0H8/L+srFQMHpwV9DqG8nO7tgnXb9SqkneKGLgRNmJ4br+tWaoVFgzkYxHFo4SVW7CbNQlWCxYvmARCuAfet+wX/tbfZ/vjzs5ufPjRYfa8z+g0bWqpsD5IaVpjRw+Fxew9mSGHDx8tF5ZBK817TEigCePvUkX2iHlo0SAk2hNiRgJNnTwKQ/KyALAPuV++Uhk0vFTevPUAOrt6+pxPTrJh4f0TVUlrxrQyxfG4KcXuPSdV8ScmJFBaeiLuHjOs32FR8DNETk9LwuiywpiQQACwYtk0VopQivWb9qqyBkbMV6/V4MTJy37LdsG8CUhIsCiKPyMjGSWj8hXLn8rKOlwov6lq3jUtgRYvmISMjOR+W7NUMxoN+OLaeTAaDZqXQMOKBmHc2GEA2Afe9x04FzS8HKaUYsNmTlb5jFSDc7MwaeJIRfFPuHuEMJGhZPT+fN9ZOBxdquZdkxIIACZOGImnnlggFIKaEghgX7T23f+zGjabRbMSiGEYrPnCHOFu7fpNe/s88K4WHztxCbcq6/ucNxgYrFk1W1H8ixfco/gpMLfbjU1b90NsauRdczfCzBYTli6ajK89tQRms8lLYgQyXh5I5YXzJyI3NwOv/3YTzpy7Djd1Bxn5+mc5Pgif89OBDC3MwazpZaCUorOzm33XLmjonY8Edji6cOjIxT5PiwHsjtPjxw3HkWPlkuPPG5yFu8cOC+k6BrMTJ68I63/UzLtmJBBjILh77HD8/Mdfw/PfXAm73QogtNasxMaUDcVrP/8GXnnpcYwfNxwGgwFsZyCMh1GRQAwh+OLaebBxT1Ddrm3GzZt1qg39vkwpxfETlwKOVF96fD67hERCnIQQLF86jStT+SO2203xrw2fBywrJRy1tUAGA4O01EQMycvGhLtHYNaM0SgsGOi3UoVjyBezxWLCfXPuxtzZ41Bd04g9n5/G0ePluFJRjbq6FvZRQz68WPb4kUBy2N+5WTPG4N4Zo4XzTc1twqK3cJVHbV1zwDDjxg7D8qVT8d6/9oQcZ1ZmChbOm6DYtytXqzybfamc97BIoOVLpmLEsMHwMgKYjOy6ntTURGRlpiAl2Q673er1pg85Q6VcCeSPcwam45GHZmHVypno6OhGc0s7amub0djUBoeji62EPi6mpSZ5+a5EAhEQ5Odl41v/thJGo0EIU1iQgyF52bh+83ZYJBABwbgxwaXKU08uQnVNEz7bezokKbJ00WSkpSUplj/vvL8bXT09svLVH4dlLdCkiSMxm9tsCVC3gvrjcBjDMLDbrbDbrRicmxV2HxhCMCgnE7NnjsFDK2YgMyOF63DYQk1NseOnrz6Nt97ejsPHytHY2CZM5fGjuFzOSE/CgnkT8fij96Uc/fkAAAeUSURBVAt54tMVc6Ldih9+73Fs3LIfm7buR8U19s2U/uLMzEzBcm761jceKVx+6RZ27zmpOI+BODwSqJ/P6uzNqSmJeON/nkVh/sCgYYfkZePlFx+D203R0urAkaPleOXVv8DpkieNnvvGCsy5dywyM5IDvlPMly0WM1atnIWHV8xES6sDWz84KDw7IA7/2Oq5yAxhCjsYU0rxuz9tY1+IrSCeYBwWCbRh8z4cPnoR8WJPPbkI6aKhXuoI1tXdg7+/swtms8FP7IGtqald6IEBSJYBBw6dx42btyWl6Wu3Khv6yKFhQwdh+dKp7K8KRshDRy5g34Fzqs/8iDksEujQ4Yui8Nwf+EhVZo/PfCOOPK9eNRvpaUmQa11dPdj64UGuuBQsFZYoAw4cOq9YovDGx2m2GPHNry8XprDlxulwdOKN323xdBgxJYHEDGVPhPXHhEtH8C1aHKSs+uNoSzA1eeXy6cJTanLjoZTir//4BOWXboXdZ83dCJPKwmglHmmjxGrfCIs1LhmZjyfWzvcqCzl26kwF/rnuU9nSTgpr5kaYbAYRtexosXJT8+ZONNhus+LFF9YgKSmBHZlFo5sU7urqwU9+/h7aVV7zE4h1CaRLIMVstZjxf194FEWFORCb1HhcLjd+8do6XK2ojpj/ugRSkeNRAhkNBjz9pUWYNaNM8T2RTVv3Y9v2QwjXeiddAoWRlZoWZIwcXvPIHDzy0CwwDCNb9hBCcPT4Jbzxu83satcI+q9LIBWYX8oRTxLIYGCwauUsfP3pJYriAYCKazV46Qf/C4ejK+J50SWQCmwysTew4kUCGQ0GPPqFuXjqiQVe+ZZjlVUNePHlt9DU0h6dvITjRpg3U1GLQBiY95lGja0WM5QaPxKrfaNHbTYwDL7xtWV46MGZwhaTcm941dY248Xvv4WK6zUgUGefH6msSyCFzDAENlvozy7EsgRKT0/GC8+vwizRMm058QBAVXUDnn/ht7h+ozaq+dIlkEJOTrQLj/vdqRKIEIKSUfl44flHMGzoIMWzPRfLb+HlH70dtqXdUliXQApZvOJRiWlB3vhjo8mAlcun4+knFwnPTwPyZc++A2fx6k/eQUNja9Rkj5h1CaSQc3MzFUsZLcgbf1w6qgDf+PoDGFNWBF+TGmdPrxPvvv8p3vzDVrhF27lHO4+6BFLIRQU5Qu92J0ggAoJBORlYvWo2Fi+8B1aLWbHkqapuwC9/vR77Dpz1PFGnkfzqEkgBMwyrjdWwaEsdEPYZ3tWrZmPBvIlIS01kwyhY0uxyubHr0xP41evrUVffwo3Y0Zc9YtYlkALOSE9CaUlhTEsgs9mIsaOHYvGCezBrxhhYLCaITU6clFJcvlKF3/5hi2cjLw1JOzHrEkgmE0KwaME9SE2xK5JAUyYVo6NjEc5fvIErV6vR3NKOzs5uuCnfykXpq8AMIUi0J2Bo0SBMm1qC6VNKMTg3U7ibrVTu1NY24711e7Bh8150dHQjEkualbAugWRyyah8PPqFuVBqQ/Ky8cRj80AIQXd3D2rrmlFZ1YArFdW4dq0GN27W4uatOrS0OuB2U654Qx/iCSFIS0tEUWEORhUPQUlxAYYPy8WA7DQQ4ukJlUgdStlnlN/9525s3nYQDY2tfcNoSPZ4lc+kmc96mry4ovdnIUsggHIjAWgYWIovajDYN5389D+fRnq6/McgpRilFI6OLtTXt6K2rhlNzW1obe2Aw9GJ7m4nXC523yKT2YgEqwVJSQlIS01CVlYKcgamIznJ5i1fVfTr0uVKbPngALZ9eBiOjq7+P6Qx0yWQBE5JtmPZkil4bM19SOJe2yR35kfMoZjdZoV9iBX5Q7JD/ozYlEobsTU1t+Pw0YvY9uEhnDpTga6uHs1LnUCsS6AgDAB2mwUjhudhyqRizLl3LAblZEBN4xuCWlIkXOxwdOHIsXJ8+tkpHDpyUZA5fcJrSN6EwvosEAUeWjETyxZP8eQT7BbqSUk2pKcleu2Z42tqzEREeybElwGg3dGJims1OH2mAoePluP4ycvo7u6FP9OCz/oskAJ5k5mejOFDBwWVKGpIHSUSKFzW2+uCo6MLTc1tuHb9Ni5cvIELF2+i4loNmlscwss4AERdroSDdQnk3fFF3MIhgSil3A/gdLngcHShra0DjU1taGxsQ119C2puN6K6uhG365pRV9+MlmaHsPluwPg1JF3UYn0WiAKpqYlISbGHmHGtGoXbTeFyueF0utDT04uu7l50id79pVtf0yUQ2K3Hm5rblJWkXOMLSyOSIN5Yfyg+yswPyUJ56RxR1meBNMDRngmJZ9YlULSZiI7QOdKsSyBdAsU16xJIAxxtGRDPrEugaDMRHaFzpFmXQLoEimvWJZAGONoyIJ5Zl0DRZiI6QudIsy6BdAkU16xLIA1wtGVAPLMugaLNRHSEzpFmXQLpEiiuWZdAGuBoy4B4Zl0CRZuJ6AidI826BNIlUFyzLoE0wNGWAfHMugSKNhPRETpHmnUJpEuguGZdAmmAoy0D4pl1CRRtJqIjdI406xJIl0BxzboE0gBHWwbEM+sSKNpMREfoHGnWJZAugeKa/z8zI9RGhInTAwAAAABJRU5ErkJggg==" />
+      <span class="name"><b>Fradema</b><small>Demonstração comercial</small></span>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="top-tag">Fluxo de captação de leads</span>
+      <button class="toggle" id="themeBtn" aria-label="Alternar tema">◐</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow reveal">Prospecção · Qualificação com IA · Agendamento</span>
+    <h1 class="reveal">Da empresa desconhecida à <em>reunião agendada</em> — no automático.</h1>
+    <p class="lede reveal">Veja como a plataforma encontra empresas na web, chega ao dono, aborda por WhatsApp e e-mail, qualifica com inteligência artificial e marca a reunião na agenda do consultor da Fradema — seja para <b>recuperar créditos tributários</b> ou <b>regularizar dívidas fiscais</b>. Sem planilha manual. Sem lead esquecido.</p>
+    <div class="hero-stats reveal">
+      <span class="chip"><span class="dot"></span> Prospecção ativa 24/7</span>
+      <span class="chip">Qualificação por <b>IA</b></span>
+      <span class="chip">Recuperação de <b>créditos</b></span>
+      <span class="chip">Regularização de <b>dívidas fiscais</b></span>
+    </div>
+  </div>
+</section>
+
+<!-- 01 DESCOBERTA -->
+<section class="stage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">01</span>
+      <div><h2>Descoberta de empresas endividadas</h2><p>Vários escopos e várias fontes cruzadas em paralelo — priorizando empresas com dívida fiscal, o melhor gatilho para a oferta da Fradema.</p></div>
+    </div>
+    <div class="card reveal">
+      <div class="browser-bar"><i></i><i></i><i></i><span class="url">escopos: indústria/Sudeste · comércio/Sul · serviços/SP — filtro: dívida ativa</span></div>
+      <div class="card-pad">
+        <div class="src-row">
+          <span class="src free">Dívida Ativa · PGFN <em>grátis</em></span>
+          <span class="src free">CNPJ / QSA · Receita <em>grátis</em></span>
+          <span class="src paid">Enriquecimento de contato <em>pago</em></span>
+          <span class="src paid">Protestos / bureaus <em>pago</em></span>
+        </div>
+        <p class="card-label">◎ Empresas com dívida cruzadas com segmento · porte · região</p>
+        <div class="disc-grid">
+          <div class="company"><h4>Comércio São Jorge</h4><div class="meta">Varejo · Simples<br>Sem dívida relevante</div></div>
+          <div class="company match"><span class="flag">alvo</span><h4>Metalúrgica Horizonte Ltda</h4><div class="meta">Indústria · Lucro Real · SP<br><span style="color:var(--danger)">● Dívida ativa: R$ 1,2M</span></div></div>
+          <div class="company"><h4>Padaria Trigo Real</h4><div class="meta">Alimentício · MEI<br>Fora do perfil</div></div>
+          <div class="company"><h4>Construtora Pilar</h4><div class="meta">Construção · Lucro Real<br><span style="color:var(--danger)">● Dívida ativa: R$ 480k</span></div></div>
+        </div>
+        <p class="src-note">Âncora pública e gratuita (PGFN, CNPJ) + camadas pagas de enriquecimento e cruzamento — há custo de dados por consulta/lote.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 ENRIQUECIMENTO -->
+<section class="stage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">02</span>
+      <div><h2>Chega ao proprietário</h2><p>A partir da empresa, o sistema resolve o decisor e seus contatos — site, quadro societário público (QSA) e outras fontes.</p></div>
+    </div>
+    <div class="card card-pad reveal">
+      <div class="enrich">
+        <div>
+          <p class="card-label">Empresa</p>
+          <div class="owner-row">
+            <div class="avatar" style="background:linear-gradient(135deg,var(--navy),var(--accent)); border-radius:12px;">MH</div>
+            <div class="kv"><b>Metalúrgica Horizonte Ltda</b><br>CNPJ 12.345.678/0001-90<br>Indústria metalúrgica · SP</div>
+          </div>
+        </div>
+        <div class="arrow">→</div>
+        <div>
+          <p class="card-label">Decisor identificado</p>
+          <div class="owner-row">
+            <div class="avatar">CM</div>
+            <div class="kv"><b>Carlos Mendes</b> · Sócio-administrador<br><span class="found">✓ WhatsApp (11) 9•••••-••32</span><br><span class="found">✓ carlos@metalurgicahorizonte.com.br</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ABORDAGEM -->
+<section class="stage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">03</span>
+      <div><h2>Abordagem multicanal</h2><p>A IA escreve uma mensagem personalizada por segmento e porte — enviada por WhatsApp e e-mail, com gancho tributário provável.</p></div>
+    </div>
+    <div class="outreach reveal">
+      <div class="msg-preview">
+        <div class="ph"><span class="ic wa">✆</span> WhatsApp · template aprovado</div>
+        <div class="body">Olá, Carlos! Aqui é a Fradema Consultores. Empresas de metalurgia no Lucro Real costumam pagar PIS/COFINS a mais — e muitas ainda carregam dívidas fiscais que dá pra renegociar. Posso te mostrar, rapidinho, o que a Horizonte tem a recuperar e a regularizar?
+        <span class="ai-tag">✦ Redigido pela IA · personalizado</span></div>
+      </div>
+      <div class="msg-preview">
+        <div class="ph"><span class="ic em">✉</span> E-mail · domínio dedicado</div>
+        <div class="body"><b>Assunto:</b> Horizonte — créditos a recuperar e dívidas a regularizar?<br><br>Carlos, uma análise inicial aponta oportunidade de recuperação de créditos e de renegociação de débitos fiscais com melhores condições. Vale 20 minutos?
+        <span class="ai-tag">✦ SPF/DKIM/DMARC · com opt-out</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 QUALIFICAÇÃO — CENTERPIECE -->
+<section class="stage center-stage" id="chatStage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">04</span>
+      <div><h2>Qualificação com IA, em conversa real</h2><p>Carlos responde. A IA conduz a qualificação em linguagem natural, pontua o lead e — se quente — já oferece horários.</p></div>
+    </div>
+    <div class="phone-layout">
+      <div class="phone reveal">
+        <div class="phone-screen">
+          <div class="wa-header">
+            <div class="av">F</div>
+            <div class="who"><b>Fradema Consultores</b><span>assistente • online</span></div>
+          </div>
+          <div class="wa-body" id="waBody">
+            <div class="typing" id="typing"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="insight" id="ins1">
+          <div class="h">◎ Leitura da IA em tempo real</div>
+          <div class="kv"><b>Regime:</b> Lucro Real &nbsp; <span class="found">✓</span><br><b>Faturamento:</b> ~R$ 40 mi/ano &nbsp; <span class="found">✓</span><br><b>Setor:</b> Indústria metalúrgica &nbsp; <span class="found">✓</span></div>
+        </div>
+        <div class="insight" id="ins2">
+          <div class="h">◎ Pontuação do lead</div>
+          <div class="score hot"><span class="flame">🔥</span><div><b>Quente</b><div class="tags"><span class="tag">Lucro Real</span><span class="tag">R$40M</span><span class="tag">parcelamento ICMS</span></div></div></div>
+          <div class="kv" style="margin-top:10px;">Dois eixos: <b>recuperar créditos</b> + <b>regularizar dívida</b> <span class="found">✓</span></div>
+        </div>
+        <div class="insight" id="ins3">
+          <div class="h">◎ Ação automática</div>
+          <div class="kv">Reunião <b>agendada</b> e lead <b>atribuído</b> ao consultor. Handoff concluído no mesmo WhatsApp.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 AGENDAMENTO -->
+<section class="stage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">05</span>
+      <div><h2>Agenda direto no Google Calendar</h2><p>A IA lê a disponibilidade do consultor e marca a reunião — sem troca de e-mails para achar horário.</p></div>
+    </div>
+    <div class="card card-pad reveal">
+      <p class="card-label">📅 Agenda · Consultor Ricardo Alves · semana 21–25 jul</p>
+      <div class="cal">
+        <div class="day"><div class="dn">Seg</div><div class="slot busy">09h</div><div class="slot busy">14h</div><div class="slot free">16h</div></div>
+        <div class="day"><div class="dn">Ter</div><div class="slot free">10h</div><div class="slot busy">14h</div><div class="slot free">17h</div></div>
+        <div class="day"><div class="dn">Qua</div><div class="slot busy">09h</div><div class="slot busy">11h</div><div class="slot free">15h</div></div>
+        <div class="day"><div class="dn">Qui</div><div class="slot free">10h</div><div class="slot booked">14h ✓</div><div class="slot busy">16h</div></div>
+        <div class="day"><div class="dn">Sex</div><div class="slot free">10h</div><div class="slot busy">13h</div><div class="slot free">15h</div></div>
+      </div>
+      <p style="margin:16px 0 0; font-size:13.5px; color:var(--ink-soft);"><b style="color:var(--accent)">✓ Confirmado:</b> Quinta, 24/07 às 14h — “Créditos + dívidas fiscais · Metalúrgica Horizonte”. Convite enviado a Carlos e ao consultor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 CRM -->
+<section class="stage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">06</span>
+      <div><h2>Tudo cai no CRM da Fradema</h2><p>Cada lead vira uma ficha com histórico, pontuação e etapa do funil. O consultor assume o que já está quente.</p></div>
+    </div>
+    <div class="card card-pad reveal">
+      <div class="kanban-scroll">
+        <div class="kanban">
+          <div class="col"><div class="ch"><span>Novo</span><span>2</span></div>
+            <div class="lead"><h5>Transportes Vale</h5><div class="sub">Logística · Presumido</div></div>
+            <div class="lead"><h5>Têxtil Aurora</h5><div class="sub">Indústria · em análise</div></div>
+          </div>
+          <div class="col"><div class="ch"><span>Qualificando</span><span>1</span></div>
+            <div class="lead"><h5>Construtora Pilar</h5><div class="sub">Lucro Real · respondendo</div></div>
+          </div>
+          <div class="col"><div class="ch"><span>Morno</span><span>1</span></div>
+            <div class="lead"><h5>Auto Peças Delta</h5><div class="sub">“me chame em 30 dias”</div></div>
+          </div>
+          <div class="col hot"><div class="ch"><span>🔥 Quente · agendado</span><span id="hotCount">1</span></div>
+            <div class="lead new-lead" id="newLead"><h5>Metalúrgica Horizonte</h5><div class="sub">Créditos + dívida ICMS · Qui 14h</div><div class="assigned"><span class="mini-av">RA</span> atribuído a Ricardo Alves</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOOP / NUTRIÇÃO -->
+<section class="stage">
+  <div class="wrap">
+    <div class="stage-head reveal">
+      <span class="stage-num">↻</span>
+      <div><h2>Quem não está pronto agora, o sistema reencontra</h2><p>Leads mornos e frios entram em nutrição automática — follow-up no tempo certo, sem depender da memória de ninguém.</p></div>
+    </div>
+    <div class="loop reveal">
+      <div class="step"><div class="n">+7 dias</div><h4>Reengajamento</h4><p>Quem sumiu no meio da conversa recebe um lembrete gentil pela IA.</p></div>
+      <div class="step"><div class="n">+30 dias</div><h4>Follow-up agendado</h4><p>“Me chame no fim do mês” vira disparo automático no dia certo.</p></div>
+      <div class="step"><div class="n">contínuo</div><h4>Conteúdo de valor</h4><p>Casos de recuperação de créditos e prazos fiscais mantêm a Fradema no radar.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOME -->
+<section class="stage" style="border-top:none;">
+  <div class="wrap">
+    <div class="outcome reveal">
+      <h2>O comercial da Fradema só fala com quem já está quente — e agendado.</h2>
+      <p style="margin:-8px 0 26px; color:#c3d3ec; font-size:15.5px; max-width:60ch;">Dois motores de valor em uma só esteira: <b style="color:#fff;">recuperação de créditos tributários</b> e <b style="color:#fff;">regularização de dívidas fiscais</b> — prospectados, qualificados e agendados no automático.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">24/7</div><div class="lbl">Prospecção e atendimento sem parar, mesmo fora do horário comercial.</div></div>
+        <div class="metric"><div class="big gold">0</div><div class="lbl">Leads esquecidos numa planilha — cada contato fica registrado e nutrido.</div></div>
+        <div class="metric"><div class="big">1</div><div class="lbl">Plataforma única: prospecção, IA, agenda e CRM no mesmo lugar, com sua marca.</div></div>
+      </div>
+      <div class="compliance">
+        <span class="cbadge"><span class="ck">✓</span> Templates WhatsApp aprovados pela Meta</span>
+        <span class="cbadge"><span class="ck">✓</span> E-mail com SPF/DKIM/DMARC</span>
+        <span class="cbadge"><span class="ck">✓</span> Conformidade com a LGPD · opt-out</span>
+        <span class="cbadge"><span class="ck">✓</span> Aquecimento gradual e volume controlado</span>
+      </div>
+    </div>
+    <div class="disclaimer">Demonstração ilustrativa. Empresas, pessoas e dados exibidos são fictícios, criados apenas para representar o fluxo. Métricas indicam a proposta de valor, não resultados garantidos.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <strong>Fradema · Plataforma de Captação de Leads</strong> — demonstração comercial preparada pela agência.<br>
+    Fluxo: Descoberta → Enriquecimento → Abordagem multicanal → Qualificação com IA → Agendamento → CRM → Nutrição.
+  </div>
+</footer>
+
+<script>
+(function(){
+  // theme toggle
+  var root = document.documentElement, btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    if(!cur){ cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'; }
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+
+  // reveal on scroll
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var revs = document.querySelectorAll('.reveal');
+  if(reduce){ revs.forEach(function(r){ r.classList.add('in'); }); }
+  else {
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, {threshold: .15});
+    revs.forEach(function(r){ io.observe(r); });
+  }
+
+  // whatsapp scripted chat
+  var body = document.getElementById('waBody');
+  var typing = document.getElementById('typing');
+  var script = [
+    {who:'out', t:'09:12', txt:'Olá, Carlos! Aqui é o assistente da Fradema Consultores. Vi que a Metalúrgica Horizonte é do setor industrial — muitas empresas assim pagam PIS/COFINS a mais e ainda carregam dívidas fiscais em aberto. Posso fazer algumas perguntas rápidas? 👋'},
+    {who:'in',  t:'09:13', txt:'Pode sim'},
+    {who:'out', t:'09:13', txt:'A Horizonte apura pelo Lucro Real ou Presumido?'},
+    {who:'in',  t:'09:14', txt:'Lucro Real'},
+    {who:'out', t:'09:14', txt:'Perfeito. E o faturamento anual fica em qual faixa, aproximadamente?', ins:'ins1'},
+    {who:'in',  t:'09:15', txt:'Uns 40 milhões'},
+    {who:'out', t:'09:15', txt:'Ótimo. E a empresa tem algum débito fiscal em aberto hoje — parcelamento, execução ou imposto em atraso?'},
+    {who:'in',  t:'09:16', txt:'Temos um parcelamento de ICMS rolando'},
+    {who:'out', t:'09:16', txt:'Entendi. Dá pra atacar os dois lados: recuperar créditos de PIS/COFINS e renegociar esse parcelamento de ICMS com condições melhores. 🔥 Quer que eu já agende 30 min com um consultor especialista? Tenho quinta às 14h ou sexta às 10h.', ins:'ins2'},
+    {who:'in',  t:'09:17', txt:'Quinta 14h fica ótimo'},
+    {who:'out', t:'09:17', txt:'Agendado! ✅ Reunião marcada para quinta, 24/07 às 14h. Enviei o convite pro seu e-mail. Um consultor da Fradema assume a conversa a partir daqui. 🤝', ins:'ins3', done:true}
+  ];
+
+  function bubble(m){
+    var b = document.createElement('div');
+    b.className = 'bubble ' + (m.who === 'out' ? 'out':'in');
+    b.innerHTML = m.txt.replace(/</g,'&lt;') + '<span class="t">'+m.t+'</span>';
+    body.insertBefore(b, typing);
+    body.scrollTop = body.scrollHeight;
+    if(m.ins){ var el = document.getElementById(m.ins); if(el) el.classList.add('on'); }
+    if(m.done){ var nl = document.getElementById('newLead'); if(nl){ nl.style.transition='transform .5s, box-shadow .5s'; } }
+  }
+
+  function playAll(){ script.forEach(bubble); typing.classList.remove('show'); }
+
+  var started = false;
+  function run(){
+    if(started) return; started = true;
+    if(reduce){ playAll(); return; }
+    var i = 0;
+    function next(){
+      if(i >= script.length){ return; }
+      var m = script[i];
+      var delay = m.who === 'out' ? 1100 : 650;
+      if(m.who === 'out'){
+        typing.classList.add('show'); body.scrollTop = body.scrollHeight;
+        setTimeout(function(){ typing.classList.remove('show'); bubble(m); i++; setTimeout(next, 550); }, delay + Math.min(m.txt.length*14, 1400));
+      } else {
+        setTimeout(function(){ bubble(m); i++; setTimeout(next, 500); }, delay);
+      }
+    }
+    next();
+  }
+
+  var stage = document.getElementById('chatStage');
+  if(reduce){ playAll(); }
+  else {
+    var io2 = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ run(); io2.unobserve(e.target); } });
+    }, {threshold: .35});
+    io2.observe(stage);
+  }
+})();
+</script>
