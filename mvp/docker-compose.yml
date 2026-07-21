@@ -1,13 +1,19 @@
 # MVP + n8n (dois serviços). Para rodar SÓ o app (um contêiner), use o Dockerfile direto.
+# Portas publicadas apenas em 127.0.0.1 (localhost) — em VPS, coloque atrás de
+# um reverse proxy com HTTPS + autenticação (ver README, seção VPS).
 services:
   app:
     build: .
     container_name: fradema-mvp
+    init: true
     ports:
-      - "3000:3000"
+      - "127.0.0.1:5100:5100"
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-5}
+      - TZ=America/Sao_Paulo
+      # Token opcional p/ proteger /api/send e /api/outbound (o n8n envia o mesmo)
+      - API_TOKEN=${API_TOKEN:-}
       # webhook do n8n avisado quando um lead vira "quente" (opcional)
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-}
     volumes:
@@ -16,16 +22,19 @@ services:
     restart: unless-stopped
 
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:1.70.0
     container_name: fradema-n8n
+    init: true
     ports:
-      - "5678:5678"
+      - "127.0.0.1:5678:5678"
     environment:
       - N8N_SECURE_COOKIE=false
       - GENERIC_TIMEZONE=America/Sao_Paulo
       - N8N_RUNNERS_ENABLED=true
+      # defina para estabilizar a cifragem das credenciais entre reinícios
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-}
     volumes:
       - ./n8n-data:/home/node/.n8n
     restart: unless-stopped
-# Rede padrão do compose: o app é acessível pelo n8n em http://app:3000
+# Rede padrão do compose: o app é acessível pelo n8n em http://app:5100
 # e o n8n pelo app em http://n8n:5678

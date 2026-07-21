@@ -2,23 +2,35 @@
 import { qualify } from './claude.js';
 import { getLead, upsertLead } from './store.js';
 
+const STAGES = ['novo', 'qualificando', 'quente', 'morno', 'frio'];
+const SCORES = ['quente', 'morno', 'frio'];
+
 function numberFromJid(jid) {
   return (jid || '').split('@')[0];
 }
 
-export async function handleIncoming(jid, text, sendText) {
+// ── Serialização por número: garante que só um processamento por jid rode por vez,
+// evitando corrida (histórico malformado / lost update) com mensagens simultâneas.
+const queues = new Map();
+function enqueue(jid, task) {
+  const prev = queues.get(jid) || Promise.resolve();
+  const next = prev.then(task, task);
+  queues.set(jid, next);
+  next.finally(() => { if (queues.get(jid) === next) queues.delete(jid); });
+  return next;
+}
+
+export function handleIncoming(jid, text, sendText) {
+  return enqueue(jid, () => _handleIncoming(jid, text, sendText));
+}
+
+export function startOutbound(jid, openerText, sendText) {
+  return enqueue(jid, () => _startOutbound(jid, openerText, sendText));
+}
+
+async function _handleIncoming(jid, text, sendText) {
   const now = Date.now();
-  const lead = getLead(jid) || {
-    jid,
-    numero: numberFromJid(jid),
-    history: [],
-    data: {},
-    stage: 'novo',
-    score: null,
-    meeting: null,
-    origem: 'inbound',
-    createdAt: now,
-  };
+  const lead = getLead(jid) || newLead(jid, 'inbound', now);
 
   const wasHot = lead.stage === 'quente';
   lead.history.push({ role: 'user', text });
@@ -26,11 +38,10 @@ export async function handleIncoming(jid, text, sendText) {
   const res = await qualify(lead.history);
 
   lead.data = { ...lead.data, ...cleanObj(res.lead) };
-  if (res.stage) lead.stage = res.stage;
-  if (res.score) lead.score = res.score;
+  if (res.stage && STAGES.includes(res.stage)) lead.stage = res.stage;
+  if (res.score && SCORES.includes(res.score)) lead.score = res.score;
   if (res.meeting) lead.meeting = res.meeting;
 
-  // Evento para o n8n: lead acabou de virar "quente" (orquestração/notificação).
   if (!wasHot && lead.stage === 'quente') notifyN8n(lead);
 
   const reply = res.reply || 'Certo!';
@@ -43,9 +54,18 @@ export async function handleIncoming(jid, text, sendText) {
 }
 
 // Dispara a abordagem inicial (outbound) e registra o lead.
-export async function startOutbound(jid, openerText, sendText) {
+async function _startOutbound(jid, openerText, sendText) {
   const now = Date.now();
-  const lead = getLead(jid) || {
+  const lead = getLead(jid) || newLead(jid, 'outbound', now);
+  lead.history.push({ role: 'assistant', text: openerText });
+  lead.updatedAt = now;
+  upsertLead(jid, lead);
+  await sendText(jid, openerText);
+  return lead;
+}
+
+function newLead(jid, origem, now) {
+  return {
     jid,
     numero: numberFromJid(jid),
     history: [],
@@ -53,14 +73,9 @@ export async function startOutbound(jid, openerText, sendText) {
     stage: 'novo',
     score: null,
     meeting: null,
-    origem: 'outbound',
+    origem,
     createdAt: now,
   };
-  lead.history.push({ role: 'assistant', text: openerText });
-  lead.updatedAt = now;
-  upsertLead(jid, lead);
-  await sendText(jid, openerText);
-  return lead;
 }
 
 // Notifica um webhook do n8n (se configurado) quando um lead esquenta.

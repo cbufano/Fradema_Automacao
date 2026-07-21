@@ -16,7 +16,10 @@ let db = load();
 
 function persist() {
   fs.mkdirSync(path.dirname(FILE), { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(db, null, 2));
+  // Escrita atômica: grava em .tmp e renomeia, para não corromper em crash.
+  const tmp = `${FILE}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+  fs.renameSync(tmp, FILE);
 }
 
 export function getLead(jid) {

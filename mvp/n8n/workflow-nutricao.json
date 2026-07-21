@@ -12,7 +12,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "http://app:3000/api/leads?stage=morno,frio",
+        "url": "http://app:5100/api/leads?stage=morno,frio",
         "options": {}
       },
       "id": "http-get-leads",
@@ -23,7 +23,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Monta uma mensagem de follow-up por lead (aceita array ou itens separados).\nlet leads = [];\nfor (const it of items) {\n  if (Array.isArray(it.json)) leads.push(...it.json);\n  else leads.push(it.json);\n}\nconst msg = 'Olá! Aqui é a Fradema Consultores. Passando para lembrar que podemos ajudar sua empresa a recuperar créditos tributários e regularizar dívidas fiscais. Quer retomar a conversa? 😊';\nreturn leads.filter(l => l && l.numero).map(l => ({ json: { numero: l.numero, mensagem: msg } }));"
+        "jsCode": "// Monta uma mensagem de follow-up por lead (aceita array ou itens separados).\nconst items = $input.all();\nlet leads = [];\nfor (const it of items) {\n  if (Array.isArray(it.json)) leads.push(...it.json);\n  else leads.push(it.json);\n}\nconst msg = 'Olá! Aqui é a Fradema Consultores. Passando para lembrar que podemos ajudar sua empresa a recuperar créditos tributários e regularizar dívidas fiscais. Quer retomar a conversa? 😊';\nreturn leads.filter(l => l && l.numero).map(l => ({ json: { numero: l.numero, mensagem: msg } }));"
       },
       "id": "code-monta-msg",
       "name": "Montar follow-up",
@@ -34,7 +34,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://app:3000/api/send",
+        "url": "http://app:5100/api/send",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ numero: $json.numero, mensagem: $json.mensagem }) }}",

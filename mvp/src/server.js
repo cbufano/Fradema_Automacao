@@ -12,8 +12,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function createServer() {
   const app = express();
-  app.use(express.json());
+  app.disable('x-powered-by');
+  app.use(express.json({ limit: '256kb' }));
   app.use(express.static(path.join(__dirname, 'public')));
+
+  // Auth opcional para endpoints de escrita: se API_TOKEN estiver definido,
+  // exige Authorization: Bearer <token> (o n8n envia o mesmo token).
+  const API_TOKEN = process.env.API_TOKEN || '';
+  function requireToken(req, res, next) {
+    if (!API_TOKEN) return next();
+    if ((req.headers.authorization || '') === `Bearer ${API_TOKEN}`) return next();
+    return res.status(401).json({ error: 'não autorizado' });
+  }
 
   app.get('/api/status', async (req, res) => {
     let qrDataUrl = null;
@@ -49,7 +59,7 @@ export function createServer() {
   });
 
   // Envio direto de mensagem — usado pelo n8n (nutrição/follow-up, disparos em lote).
-  app.post('/api/send', async (req, res) => {
+  app.post('/api/send', requireToken, async (req, res) => {
     try {
       if (!wa.connected) return res.status(400).json({ error: 'WhatsApp não conectado.' });
       const numero = String(req.body?.numero || '').replace(/\D/g, '');
@@ -62,7 +72,7 @@ export function createServer() {
     }
   });
 
-  app.post('/api/outbound', async (req, res) => {
+  app.post('/api/outbound', requireToken, async (req, res) => {
     try {
       if (!wa.connected) return res.status(400).json({ error: 'WhatsApp não conectado. Escaneie o QR primeiro.' });
       const numero = String(req.body?.numero || '').replace(/\D/g, '');

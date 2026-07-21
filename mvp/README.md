@@ -18,27 +18,34 @@ O app em si concentra:
 
 Pré-requisito: Docker instalado e uma **API key do Claude**.
 
-```bash
-# 1. Construir a imagem
-docker build -t fradema-mvp .
+**Recomendado: docker compose** (evita a pegadinha de volume do Git Bash e já aplica `restart`, `init`, healthcheck e bind em localhost):
 
-# 2. Rodar (persistindo sessão do WhatsApp e leads em ./data e ./auth)
-docker run -d --name fradema-mvp \
-  -p 3000:3000 \
+```bash
+# crie um .env a partir do exemplo e preencha ANTHROPIC_API_KEY
+cp .env.example .env
+
+# sobe só o app (1 contêiner)
+docker compose up -d --build app
+# logs
+docker compose logs -f app
+```
+
+Alternativa com `docker run`:
+
+```bash
+docker build -t fradema-mvp .
+docker run -d --name fradema-mvp --restart unless-stopped -p 127.0.0.1:5100:5100 \
   -e ANTHROPIC_API_KEY="sua-chave-aqui" \
   -v "$(pwd)/data:/app/data" \
   -v "$(pwd)/auth:/app/auth" \
   fradema-mvp
-
-# 3. Ver logs (opcional)
-docker logs -f fradema-mvp
 ```
 
-No Windows (PowerShell), troque `$(pwd)` por `${PWD}`.
+> ⚠️ **Git Bash no Windows** converte os caminhos do `-v` e quebra os volumes (a sessão do WhatsApp e os leads vão parar num volume anônimo e se perdem no próximo rebuild). Use **`docker compose`** (recomendado), ou o **PowerShell** com `${PWD}`, ou prefixe `MSYS_NO_PATHCONV=1` no Git Bash.
 
 ## Como usar
 
-1. Abra **http://localhost:3000**.
+1. Abra **http://localhost:5100**.
 2. No cartão **Conexão WhatsApp**, escaneie o **QR code** com o celular
    (WhatsApp → *Aparelhos conectados* → *Conectar aparelho*).
 3. Quando ficar **conectado ✓**:
@@ -55,19 +62,19 @@ O n8n entra ao lado do app (via `docker-compose`) para o que ele faz de melhor: 
 ANTHROPIC_API_KEY="sua-chave" docker compose up -d --build
 ```
 
-- App (painel): **http://localhost:3000**
+- App (painel): **http://localhost:5100**
 - n8n (editor): **http://localhost:5678**
 
-Na rede do compose, o n8n fala com o app em **`http://app:3000`**.
+Na rede do compose, o n8n fala com o app em **`http://app:5100`**.
 
 ### Importar o workflow de nutrição
 
 1. Abra o n8n (`http://localhost:5678`) e crie a conta local.
 2. **Workflows → Import from File →** selecione `n8n/workflow-nutricao.json`.
 3. Abra o workflow e clique em **Execute Workflow**. Ele:
-   - busca os leads `morno`/`frio` em `GET http://app:3000/api/leads?stage=morno,frio`;
+   - busca os leads `morno`/`frio` em `GET http://app:5100/api/leads?stage=morno,frio`;
    - monta uma mensagem de follow-up;
-   - envia por `POST http://app:3000/api/send`.
+   - envia por `POST http://app:5100/api/send`.
 4. Para automatizar, troque o nó **Disparar** (manual) por um **Schedule Trigger** (ex.: a cada 1 dia).
 
 > Se a importação falhar por versão do n8n, monte os 4 nós manualmente na mesma ordem (Manual/Schedule → HTTP GET leads → Code → HTTP POST send) usando as URLs acima.
@@ -90,7 +97,7 @@ Defina `N8N_WEBHOOK_URL` apontando para um **Webhook** do n8n. Quando um lead vi
 ```bash
 npm install
 ANTHROPIC_API_KEY="sua-chave" npm start
-# abra http://localhost:3000
+# abra http://localhost:5100
 ```
 
 ## Estrutura
@@ -110,10 +117,27 @@ n8n/
   workflow-nutricao.json  # workflow de follow-up pronto para importar
 ```
 
+## Produção / VPS — checklist de segurança
+
+Este MVP foi endurecido, mas antes de expor a um cliente/na internet:
+
+1. **Suba por `docker compose up -d`** (garante binds corretos, `restart: unless-stopped`, `init`).
+2. **Não exponha as portas na internet.** O compose publica 5100 e 5678 **só em `127.0.0.1`**. Coloque um **reverse proxy** (Caddy/Nginx) com **HTTPS + autenticação** na frente, e firewall liberando só 80/443.
+3. **Proteja os endpoints de escrita:** defina `API_TOKEN` no `.env` (exige `Authorization: Bearer` em `/api/send` e `/api/outbound`; o n8n envia o mesmo token).
+4. **n8n:** crie a conta de owner no primeiro acesso, defina `N8N_ENCRYPTION_KEY`, e nunca publique a 5678 para fora (túnel/VPN).
+5. **Permissões dos volumes (Linux):** o contêiner roda como uid 1000. Garanta que `data/` e `auth/` sejam graváveis: `sudo chown -R 1000:1000 data auth`.
+6. **Backup dos volumes** `data/` (leads — LGPD) e `auth/` (sessão do WhatsApp). Sem backup, recriar = reescanear o QR.
+7. **WhatsApp:** para produção, migre do Baileys (não-oficial) para a **WhatsApp Cloud API oficial** (ver spec). Baileys é só para o demo, com número descartável.
+8. **Teste ponta a ponta** (inbound + outbound + nutrição n8n) antes de apresentar.
+
 ## Variáveis de ambiente
 
 | Variável | Obrigatória | Padrão | Descrição |
 |---|---|---|---|
 | `ANTHROPIC_API_KEY` | sim | — | Chave da API do Claude |
 | `CLAUDE_MODEL` | não | `claude-sonnet-5` | Modelo usado na qualificação |
-| `PORT` | não | `3000` | Porta do painel |
+| `PORT` | não | `5100` | Porta do painel |
+| `API_TOKEN` | não | — | Se definido, exige Bearer token em `/api/send` e `/api/outbound` |
+| `N8N_WEBHOOK_URL` | não | — | Webhook avisado quando um lead vira "quente" |
+| `N8N_ENCRYPTION_KEY` | não | — | Estabiliza a cifragem das credenciais do n8n |
+| `TZ` | não | `America/Sao_Paulo` | Fuso horário do contêiner |

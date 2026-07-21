@@ -16,17 +16,36 @@ export const wa = {
   sock: null,
 };
 
+// Desembrulha mensagens efêmeras/viewOnce que encapsulam o conteúdo real.
+function unwrap(m) {
+  if (!m) return null;
+  if (m.ephemeralMessage) return unwrap(m.ephemeralMessage.message);
+  if (m.viewOnceMessage) return unwrap(m.viewOnceMessage.message);
+  if (m.viewOnceMessageV2) return unwrap(m.viewOnceMessageV2.message);
+  if (m.viewOnceMessageV2Extension) return unwrap(m.viewOnceMessageV2Extension.message);
+  if (m.documentWithCaptionMessage) return unwrap(m.documentWithCaptionMessage.message);
+  return m;
+}
+
 function textFromMessage(msg) {
-  const m = msg.message;
+  const m = unwrap(msg.message);
   if (!m) return null;
   return (
     m.conversation ||
     m.extendedTextMessage?.text ||
     m.imageMessage?.caption ||
     m.videoMessage?.caption ||
+    m.buttonsResponseMessage?.selectedDisplayText ||
+    m.buttonsResponseMessage?.selectedButtonId ||
+    m.listResponseMessage?.title ||
+    m.listResponseMessage?.singleSelectReply?.selectedRowId ||
+    m.templateButtonReplyMessage?.selectedDisplayText ||
     null
   );
 }
+
+let reconnecting = false;
+let attempts = 0;
 
 export async function startWhatsApp({ onMessage }) {
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
@@ -53,14 +72,30 @@ export async function startWhatsApp({ onMessage }) {
     if (connection === 'open') {
       wa.connected = true;
       wa.qr = null;
+      attempts = 0;
       console.log('[whatsapp] conectado ✓');
     }
     if (connection === 'close') {
       wa.connected = false;
       const code = lastDisconnect?.error?.output?.statusCode;
-      const shouldReconnect = code !== DisconnectReason.loggedOut;
-      console.log('[whatsapp] conexão fechada. reconectar:', shouldReconnect);
-      if (shouldReconnect) startWhatsApp({ onMessage });
+      const loggedOut = code === DisconnectReason.loggedOut;
+      try { sock.ev.removeAllListeners('connection.update'); } catch { /* noop */ }
+      try { sock.end?.(); } catch { /* noop */ }
+
+      if (loggedOut) {
+        wa.qr = null;
+        console.log('[whatsapp] deslogado — apague a pasta AUTH_DIR e reescaneie o QR.');
+        return;
+      }
+      if (reconnecting) return;
+      reconnecting = true;
+      attempts = Math.min(attempts + 1, 6);
+      const delay = Math.min(30000, 1000 * 2 ** attempts); // backoff exponencial (máx 30s)
+      console.log(`[whatsapp] conexão fechada. reconectando em ${Math.round(delay / 1000)}s`);
+      setTimeout(() => {
+        reconnecting = false;
+        startWhatsApp({ onMessage }).catch((e) => console.error('[whatsapp] reconexão falhou:', e?.message || e));
+      }, delay);
     }
   });
 

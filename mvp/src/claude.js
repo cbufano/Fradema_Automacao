@@ -47,18 +47,35 @@ function extractJson(text) {
   }
 }
 
+const MAX_TURNS = 24;
+
+// A API exige que a 1ª mensagem seja 'user'. O opener outbound é 'assistant',
+// então normalizamos (descartamos turnos 'assistant' iniciais) e limitamos o tamanho.
+function normalizeHistory(history) {
+  let msgs = history.map((h) => ({ role: h.role, content: h.text }));
+  while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+  if (msgs.length > MAX_TURNS) msgs = msgs.slice(-MAX_TURNS);
+  while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+  return msgs;
+}
+
 export async function qualify(history) {
   try {
+    const messages = normalizeHistory(history);
+    if (!messages.length) {
+      return { reply: 'Olá! Como posso ajudar a sua empresa hoje?', lead: {}, stage: 'novo', score: null, meeting: '' };
+    }
     const msg = await client.messages.create({
       model: MODEL,
       max_tokens: 800,
       system: SYSTEM,
-      messages: history.map((h) => ({ role: h.role, content: h.text })),
+      messages,
     });
     const raw = msg.content?.[0]?.text || '';
     const parsed = extractJson(raw);
     if (!parsed || !parsed.reply) {
-      return { reply: raw.trim() || 'Certo! Pode me contar um pouco mais sobre a sua empresa?', lead: {}, stage: 'qualificando', score: null, meeting: '' };
+      // Nunca enviar o texto/JSON cru ao lead — mensagem genérica segura.
+      return { reply: 'Certo! Pode me contar um pouco mais sobre a sua empresa e o que você procura?', lead: {}, stage: 'qualificando', score: null, meeting: '' };
     }
     return parsed;
   } catch (err) {
